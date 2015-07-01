@@ -1,0 +1,55 @@
+{
+  "name": "github-actions",
+  "version": "0.0.0",
+  "author": "Marvin Pinto",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/**"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marvinpinto/actions.git"
+  },
+  "config": {
+    "eslintPaths": ".*.js *.js",
+    "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json !lerna.json"
+  },
+  "scripts": {
+    "test": "lerna run test --stream --no-bail",
+    "build": "lerna run build --stream",
+    "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
+    "reinstall": "yarn clean; yarn install",
+    "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier && yarn run lint:commits",
+    "lint:eslint": "eslint --max-warnings=0 $npm_package_config_eslintPaths",
+    "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
+    "lint:commits": "commitlint --to .",
+    "lintfix": "lerna run lintfix --stream && yarn run lintfix:eslint && yarn run lintfix:prettier",
+    "lintfix:eslint": "eslint --fix  $npm_package_config_eslintPaths",
+    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths",
+    "release": "lerna version"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/config-lerna-scopes": "^8.2.0",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.12",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "@zeit/ncc": "^0.20.5",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-jest": "^22.17.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^24.9.0",
+    "jest-circus": "^24.9.0",
+    "lerna": "^3.17.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.4"
+  },
+  "eslintIgnore": [
+    "!.*.js"
+  ]
+}

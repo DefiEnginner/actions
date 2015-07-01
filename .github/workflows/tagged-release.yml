@@ -1,0 +1,49 @@
+---
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
+        with:
+          lfs: true
+
+      - name: "Install and build"
+        run: |
+          yarn run reinstall
+          yarn run build
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            packages/automatic-releases/dist/index.js
+            packages/keybase-notifications/dist/index.js
+            packages/keybase-notifications/dist/keybase
+        id: "automatic_releases"
+
+      # marvinpinto/action-keybase-notifications
+      # marvinpinto/action-automatic-releases
+      - name: "Automatically mirror release artifacts"
+        env:
+          GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
+        run: |
+          ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+
+      - uses: "marvinpinto/action-keybase-notifications@latest"
+        with:
+          message: "Version `${{ steps.automatic_releases.outputs.automatic_releases_tag }}` of `${{ github.repository }}` successfully released."
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
+          keybase_team_name: "${{ secrets.KeybaseTeamName }}"
+          keybase_topic_name: "${{ secrets.KeybaseTopicName }}"
